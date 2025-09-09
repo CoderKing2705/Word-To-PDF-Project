@@ -1,0 +1,4 @@
+/* Tailwind is doing most of the work, keep this minimal */
+table {
+    font-size: 0.9rem;
+}

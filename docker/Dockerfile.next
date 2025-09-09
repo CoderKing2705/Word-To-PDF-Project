@@ -1,0 +1,29 @@
+FROM node:20-bullseye
+
+
+# Install LibreOffice headless
+RUN apt-get update \
+&& apt-get install -y libreoffice libreoffice-writer \
+&& rm -rf /var/lib/apt/lists/*
+
+
+WORKDIR /app
+
+
+# Install deps first for caching
+COPY apps/backend-next/package*.json ./
+RUN npm ci
+
+
+# Copy source
+COPY apps/backend-next .
+
+
+# Build
+RUN npm run build
+
+
+# Runtime
+ENV PORT=3000
+EXPOSE 3000
+CMD ["npm", "run", "start"]

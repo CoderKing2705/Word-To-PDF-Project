@@ -1,0 +1,30 @@
+generator client {
+provider = "prisma-client-js"
+}
+
+
+datasource db {
+provider = "postgresql"
+url = env("DATABASE_URL")
+}
+
+
+model Conversion {
+id String @id @default(cuid())
+originalName String
+mimeType String
+sizeBytes Int
+status Status @default(PENDING)
+errorMessage String? @db.Text
+originalPath String
+pdfPath String?
+createdAt DateTime @default(now())
+updatedAt DateTime @updatedAt
+}
+
+
+enum Status {
+PENDING
+DONE
+FAILED
+}

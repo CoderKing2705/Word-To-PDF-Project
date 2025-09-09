@@ -1,0 +1,56 @@
+<div class="max-w-4xl mx-auto py-10 px-4">
+    <!-- Upload Form -->
+    <div class="bg-white shadow-md rounded-2xl p-6 mb-10">
+        <h2 class="text-xl font-bold mb-4">Upload Word Document</h2>
+        <div class="flex items-center gap-4">
+            <input type="file" (change)="onFileChange($event)" accept=".doc,.docx" class="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0
+         file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
+            <button (click)="uploadFile()" [disabled]="!file || loading"
+                class="bg-blue-600 text-white px-5 py-2 rounded-xl shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                {{ loading ? 'Uploading...' : 'Upload' }}
+            </button>
+        </div>
+        <p *ngIf="error" class="text-red-500 mt-2 text-sm">{{ error }}</p>
+    </div>
+
+    <!-- Conversions Table -->
+    <div class="bg-white shadow-md rounded-2xl p-6">
+        <h2 class="text-xl font-bold mb-4">Conversion History</h2>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="px-4 py-2">File Name</th>
+                        <th class="px-4 py-2">Size</th>
+                        <th class="px-4 py-2">Status</th>
+                        <th class="px-4 py-2">Created</th>
+                        <th class="px-4 py-2">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let conv of conversions" class="border-t">
+                        <td class="px-4 py-2">{{ conv.originalName }}</td>
+                        <td class="px-4 py-2">{{ (conv.sizeBytes / 1024).toFixed(1) }} KB</td>
+                        <td class="px-4 py-2">
+                            <span class="px-3 py-1 rounded-full text-xs font-medium" [ngClass]="{
+                  'bg-yellow-100 text-yellow-700': conv.status === 'PENDING',
+                  'bg-green-100 text-green-700': conv.status === 'DONE',
+                  'bg-red-100 text-red-700': conv.status === 'FAILED'
+                }">
+                                {{ conv.status }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-2">{{ conv.createdAt | date: 'short' }}</td>
+                        <td class="px-4 py-2">
+                            <button *ngIf="conv.status === 'DONE'" (click)="downloadFile(conv.id, conv.originalName)"
+                                class="bg-green-600 text-white px-3 py-1 rounded-lg shadow hover:bg-green-700 text-sm">
+                                Download
+                            </button>
+                            <span *ngIf="conv.status !== 'DONE'" class="text-gray-400 text-sm">N/A</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
