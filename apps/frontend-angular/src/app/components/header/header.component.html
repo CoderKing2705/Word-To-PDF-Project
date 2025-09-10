@@ -1,16 +1,45 @@
 <header class="bg-gradient-to-r from-blue-800 via-indigo-700 to-purple-800 shadow-md sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         <!-- Logo / App Title -->
-        <h1 class="text-2xl font-extrabold text-white tracking-wide">
+        <h1 class="text-2xl font-extrabold text-white tracking-wide cursor-pointer" routerLink="/">
             File Manager
         </h1>
 
-        <!-- Actions -->
-        <div>
-            <button *ngIf="isLoggedIn" (click)="logout()"
-                class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg shadow-md transition font-semibold">
-                Logout
-            </button>
+        <!-- Middle nav links -->
+        <nav class="hidden md:flex space-x-6 text-white text-sm font-medium">
+            <a routerLink="/about" class="hover:text-indigo-200 transition">About</a>
+            <a routerLink="/help" class="hover:text-indigo-200 transition">Help</a>
+        </nav>
+
+        <!-- Right section -->
+        <div class="flex items-center space-x-4">
+            <!-- When not logged in -->
+            <ng-container *ngIf="!isLoggedIn; else loggedInBlock">
+                <a routerLink="/login"
+                    class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition">
+                    Login
+                </a>
+                <a routerLink="/signup"
+                    class="px-4 py-2 bg-white hover:bg-gray-100 text-indigo-700 rounded-lg font-semibold transition">
+                    Sign up
+                </a>
+            </ng-container>
+
+            <!-- When logged in -->
+            <ng-template #loggedInBlock>
+                <div class="flex items-center space-x-3">
+                    <!-- Simple avatar circle -->
+                    <div
+                        class="w-9 h-9 rounded-full bg-white flex items-center justify-center text-indigo-700 font-bold">
+                        {{ userEmail ? (userEmail.charAt(0) | uppercase) : 'U' }}
+                    </div>
+                    <span class="text-white hidden sm:block">{{ userEmail }}</span>
+                    <button (click)="logout()"
+                        class="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded-lg shadow-md transition font-semibold">
+                        Logout
+                    </button>
+                </div>
+            </ng-template>
         </div>
     </div>
 </header>
