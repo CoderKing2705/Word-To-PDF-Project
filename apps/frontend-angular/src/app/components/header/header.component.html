@@ -13,25 +13,21 @@
 
         <!-- Right section -->
         <div class="flex items-center space-x-4">
-            <!-- When not logged in -->
-            <ng-container *ngIf="!isLoggedIn; else loggedInBlock">
+            <!-- Not logged in -->
+            <ng-container *ngIf="!isLoggedIn">
                 <a routerLink="/login"
-                    class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition">
-                    Login
-                </a>
+                    class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition">Login</a>
                 <a routerLink="/signup"
-                    class="px-4 py-2 bg-white hover:bg-gray-100 text-indigo-700 rounded-lg font-semibold transition">
-                    Sign up
-                </a>
+                    class="px-4 py-2 bg-white hover:bg-gray-100 text-indigo-700 rounded-lg font-semibold transition">Sign
+                    up</a>
             </ng-container>
 
-            <!-- When logged in -->
-            <ng-template #loggedInBlock>
+            <!-- Logged in -->
+            <ng-container *ngIf="isLoggedIn">
                 <div class="flex items-center space-x-3">
-                    <!-- Simple avatar circle -->
                     <div
                         class="w-9 h-9 rounded-full bg-white flex items-center justify-center text-indigo-700 font-bold">
-                        {{ userEmail ? (userEmail.charAt(0) | uppercase) : 'U' }}
+                        {{ userInitial }}
                     </div>
                     <span class="text-white hidden sm:block">{{ userEmail }}</span>
                     <button (click)="logout()"
@@ -39,7 +35,7 @@
                         Logout
                     </button>
                 </div>
-            </ng-template>
+            </ng-container>
         </div>
     </div>
 </header>

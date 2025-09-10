@@ -26,19 +26,16 @@ export class LoginComponent {
   }
 
   login() {
-    if (this.loginForm.invalid) {
-      this.loginForm.markAllAsTouched();
-      return;
-    }
+    if (this.loginForm.invalid) return;
 
-    this.http
-      .post('http://localhost:3000/api/auth/login', this.loginForm.value)
+    this.http.post('http://localhost:3000/api/auth/login', this.loginForm.value)
       .subscribe({
         next: (res: any) => {
           localStorage.setItem('token', res.token);
-          this.router.navigateByUrl('/'); // Angular navigate
+          localStorage.setItem('email', this.loginForm.value.email); // store email
+          window.location.href = '/'; // refresh page so header picks it up
         },
-        error: () => (this.error = 'Invalid email or password'),
+        error: () => this.error = 'Invalid email or password'
       });
   }
   togglePassword() {

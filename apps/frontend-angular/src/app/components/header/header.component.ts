@@ -1,28 +1,39 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule,RouterModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css'
 })
-export class HeaderComponent {
-  // This flag can come from your auth service
-  @Input() isLoggedIn = false;
-  @Input() userEmail = ''; // optional email
+export class HeaderComponent implements OnInit {
+  isLoggedIn = false;
+  userEmail: string | null = null;
 
   constructor(private router: Router) { }
 
-  get userInitial(): string {
-    return this.userEmail ? this.userEmail.charAt(0).toUpperCase() : 'U';
+  ngOnInit(): void {
+    // check token and email at load time
+    const token = localStorage.getItem('token');
+    const email = localStorage.getItem('email'); // store this at login
+    if (token) {
+      this.isLoggedIn = true;
+      this.userEmail = email;
+    }
   }
-  
+
   logout() {
     localStorage.removeItem('token');
+    localStorage.removeItem('email');
     this.isLoggedIn = false;
+    this.userEmail = null;
     this.router.navigate(['/login']);
+  }
+
+  get userInitial() {
+    return this.userEmail ? this.userEmail[0].toUpperCase() : 'U';
   }
 }
