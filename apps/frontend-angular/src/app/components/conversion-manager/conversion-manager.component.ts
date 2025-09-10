@@ -19,6 +19,10 @@ export class ConversionManagerComponent {
   constructor(private conversionService: ConversionService) { }
 
   ngOnInit(): void {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      window.location.href = '/login';
+    }
     this.loadConversions();
   }
 

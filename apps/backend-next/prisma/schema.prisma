@@ -1,30 +1,40 @@
 generator client {
-provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
-
 
 datasource db {
-provider = "postgresql"
-url = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
+model User {
+  id        String       @id @default(cuid())
+  email     String       @unique
+  password  String
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  conversions Conversion[]
+}
 
 model Conversion {
-id String @id @default(cuid())
-originalName String
-mimeType String
-sizeBytes Int
-status Status @default(PENDING)
-errorMessage String? @db.Text
-originalPath String
-pdfPath String?
-createdAt DateTime @default(now())
-updatedAt DateTime @updatedAt
+  id           String   @id @default(cuid())
+  originalName String
+  mimeType     String
+  sizeBytes    Int
+  status       Status   @default(PENDING)
+  errorMessage String?   // removed @db.Text
+  originalPath String
+  pdfPath      String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user   User?   @relation(fields: [userId], references: [id])
+  userId String?
 }
 
-
 enum Status {
-PENDING
-DONE
-FAILED
+  PENDING
+  DONE
+  FAILED
 }

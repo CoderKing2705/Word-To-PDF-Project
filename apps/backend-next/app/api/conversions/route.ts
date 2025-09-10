@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { prisma } from "../../../lib/db.js";
 import { handleOptions, withCors } from "../../../lib/cors.js";
 
-
 export async function OPTIONS() {
     return handleOptions();
 }
@@ -24,12 +23,15 @@ export async function GET() {
             },
         });
 
-        return NextResponse.json(conversions);
+        // ✅ Always wrap withCors
+        return withCors(NextResponse.json(conversions));
     } catch (err) {
         console.error("Error fetching conversions:", err);
-        return withCors(NextResponse.json(
-            { error: "Failed to fetch conversions" },
-            { status: 500 }
-        ));
+        return withCors(
+            NextResponse.json(
+                { error: "Failed to fetch conversions" },
+                { status: 500 }
+            )
+        );
     }
 }

@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "../../../lib/db";
-import { saveFile, convertToPdf } from "../../../lib/storage.js";
+import { prisma } from "../../../lib/prisma";
+import { saveFile, convertToPdf } from "../../../lib/storage";
 import { fileTypeFromBuffer } from "file-type";
 import { handleOptions, withCors } from "../../../lib/cors";
+import { verifyToken } from "../../../lib/auth";  // 👈 import JWT utils
 
+// 👇 this handles the preflight automatically
 export async function OPTIONS() {
-  return handleOptions();
+    return handleOptions();
 }
 
 export async function POST(req: NextRequest) {
@@ -14,15 +16,18 @@ export async function POST(req: NextRequest) {
         const file = formData.get("file") as File | null;
 
         if (!file) {
-            return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
+            return withCors(
+                NextResponse.json({ error: "No file uploaded" }, { status: 400 })
+            );
         }
 
-        // Validate size (max 10MB)
+        // validate
         if (file.size > 10 * 1024 * 1024) {
-            return NextResponse.json({ error: "File too large" }, { status: 413 });
+            return withCors(
+                NextResponse.json({ error: "File too large" }, { status: 413 })
+            );
         }
 
-        // Validate type
         const buffer = Buffer.from(await file.arrayBuffer());
         const type = await fileTypeFromBuffer(buffer);
 
@@ -33,16 +38,13 @@ export async function POST(req: NextRequest) {
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
             ].includes(type.mime)
         ) {
-            return NextResponse.json(
-                { error: "Unsupported file type" },
-                { status: 415 }
+            return withCors(
+                NextResponse.json({ error: "Unsupported file type" }, { status: 415 })
             );
         }
 
-        // Save file to disk
-        const { filePath, fileName } = await saveFile(buffer, file.name);
+        const { filePath } = await saveFile(buffer, file.name);
 
-        // Create DB record with status PENDING
         const conversion = await prisma.conversion.create({
             data: {
                 originalName: file.name,
@@ -53,40 +55,28 @@ export async function POST(req: NextRequest) {
             },
         });
 
-        try {
-            // Run conversion
-            const pdfPath = await convertToPdf(filePath);
+        // conversion
+        const pdfPath = await convertToPdf(filePath);
 
-            // Update DB with DONE status
-            const updated = await prisma.conversion.update({
-                where: { id: conversion.id },
-                data: {
-                    status: "DONE",
-                    pdfPath,
-                },
-            });
+        const updated = await prisma.conversion.update({
+            where: { id: conversion.id },
+            data: {
+                status: "DONE",
+                pdfPath,
+            },
+        });
 
-            return withCors(NextResponse.json({ id: updated.id, status: updated.status }));
-        } catch (err: any) {
-            // Update DB with FAILED status
-            await prisma.conversion.update({
-                where: { id: conversion.id },
-                data: {
-                    status: "FAILED",
-                    errorMessage: err.message ?? "Unknown error during conversion",
-                },
-            });
-
-            return NextResponse.json(
-                { error: "Conversion failed" },
+        return withCors(
+            NextResponse.json({ id: updated.id, status: updated.status })
+        );
+    } catch (err: any) {
+        console.error("Unexpected error in /convert:", err);
+        return withCors(
+            NextResponse.json(
+                { error: "Internal server error", details: err.message },
                 { status: 500 }
-            );
-        }
-    } catch (err) {
-        console.error("Unexpected error", err);
-        return NextResponse.json(
-            { error: "Internal server error" },
-            { status: 500 }
+            )
         );
     }
 }
+

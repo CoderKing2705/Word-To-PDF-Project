@@ -1,0 +1,73 @@
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-6">
+    <div
+        class="grid md:grid-cols-2 bg-gray-800/90 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden max-w-4xl w-full transform transition hover:shadow-purple-800/40 hover:scale-[1.01]">
+        <!-- Left side with image -->
+        <div class="relative hidden md:block">
+            <img src="assets/Images/login_img.jpg" alt="Login Illustration" class="h-full w-full object-cover" />
+            <div class="absolute inset-0 bg-gradient-to-br from-purple-700/60 to-blue-700/60"></div>
+            <div class="absolute bottom-6 left-6 text-white space-y-1 animate-fadeIn">
+                <h2 class="text-3xl font-extrabold">Welcome Back!</h2>
+                <p class="text-sm text-gray-200">Sign in to manage your files</p>
+            </div>
+        </div>
+
+        <!-- Right side with form -->
+        <div class="p-8 flex flex-col justify-center">
+            <h2
+                class="login-title text-3xl font-extrabold text-center bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-6">
+                Login
+            </h2>
+
+            <form [formGroup]="loginForm" (ngSubmit)="login()" class="space-y-5">
+                <!-- Email -->
+                <div class="relative">
+                    <input type="email" formControlName="email" placeholder="Email address"
+                        class="peer w-full px-4 py-3 rounded-xl bg-gray-900 border border-gray-600 text-gray-100 placeholder-transparent focus:border-purple-400 focus:ring-2 focus:ring-purple-400 focus:outline-none transition duration-300" />
+                    <label
+                        class="absolute left-4 -top-3.5 text-gray-400 text-sm bg-gray-800 px-1 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500">Email</label>
+                </div>
+                <div *ngIf="
+            loginForm.get('email')?.touched && loginForm.get('email')?.invalid
+          " class="text-red-400 text-sm">
+                    <span *ngIf="loginForm.get('email')?.errors?.['required']">Email is required.</span>
+                    <span *ngIf="loginForm.get('email')?.errors?.['email']">Enter a valid email.</span>
+                </div>
+
+                <!-- Password -->
+                <div class="relative">
+                    <input [type]="showPassword ? 'text' : 'password'" formControlName="password" placeholder="Password"
+                        class="peer w-full px-4 py-3 rounded-xl bg-gray-900 border border-gray-600 text-gray-100 placeholder-transparent focus:border-purple-400 focus:ring-2 focus:ring-purple-400 focus:outline-none transition duration-300" />
+                    <label
+                        class="absolute left-4 -top-3.5 text-gray-400 text-sm bg-gray-800 px-1 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500">Password</label>
+                    <!-- Eye toggle -->
+                    <button type="button" (click)="togglePassword()"
+                        class="absolute right-3 top-3 text-gray-400 hover:text-purple-300 transition">
+                        {{ showPassword ? '🙈' : '👁️' }}
+                    </button>
+                </div>
+                <div *ngIf="
+            loginForm.get('password')?.touched &&
+            loginForm.get('password')?.invalid
+          " class="text-red-400 text-sm">
+                    <span *ngIf="loginForm.get('password')?.errors?.['required']">Password is required.</span>
+                    <span *ngIf="loginForm.get('password')?.errors?.['minlength']">Minimum 6 characters.</span>
+                </div>
+
+                <!-- Error from API -->
+                <p *ngIf="error" class="text-red-400 text-sm text-center">{{ error }}</p>
+
+                <!-- Submit -->
+                <button type="submit"
+                    class="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-semibold py-3 rounded-xl shadow-md transition-transform duration-300 hover:-translate-y-0.5">
+                    Sign In
+                </button>
+            </form>
+
+            <p class="mt-6 text-sm text-gray-400 text-center">
+                Don’t have an account?
+                <a routerLink="/signup" class="text-purple-400 hover:underline hover:text-purple-300 transition">Sign
+                    up</a>
+            </p>
+        </div>
+    </div>
+</div>
