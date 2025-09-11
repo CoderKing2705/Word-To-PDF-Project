@@ -3,6 +3,7 @@ import { prisma } from "../../../lib/prisma";
 import { saveFile, convertToPdf } from "../../../lib/storage";
 import { fileTypeFromBuffer } from "file-type";
 import { handleOptions, withCors } from "../../../lib/cors";
+import { verifyToken } from "../../../lib/auth";
 
 // 👇 this handles the preflight automatically
 export async function OPTIONS() {
@@ -11,6 +12,17 @@ export async function OPTIONS() {
 
 export async function POST(req: NextRequest) {
     try {
+        // 🔑 get token from Authorization header
+        const token = req.headers.get("authorization")?.split(" ")[1];
+        if (!token) {
+            return withCors(NextResponse.json({ error: "Unauthorized" }, { status: 401 }));
+        }
+        const decoded = verifyToken(token); // should give you { userId, email }
+        if (!decoded) {
+            return withCors(
+                NextResponse.json({ error: "Invalid token" }, { status: 401 })
+            );
+        }
         const formData = await req.formData();
         const file = formData.get("file") as File | null;
 
@@ -51,6 +63,7 @@ export async function POST(req: NextRequest) {
                 sizeBytes: file.size,
                 status: "PENDING",
                 originalPath: filePath,
+                userId: decoded.userId,
             },
         });
 

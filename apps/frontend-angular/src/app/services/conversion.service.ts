@@ -17,17 +17,27 @@ export class ConversionService {
   // }
 
   uploadFile(file: File): Observable<any> {
+    const token = localStorage.getItem('token');
     const formData = new FormData();
     formData.append('file', file);
 
     return this.http.post(`${this.apiUrl}/convert`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
       reportProgress: true,
       observe: 'events',   // 👈 so we get upload progress
     });
   }
 
   getConversions(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/conversions`);
+    const token = localStorage.getItem('token');
+    return this.http.get<any[]>(`${this.apiUrl}/conversions`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
   }
 
   downloadFile(id: string): Observable<Blob> {
