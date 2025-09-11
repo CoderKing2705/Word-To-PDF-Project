@@ -1,9 +1,15 @@
+import path from "path";
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    output: 'standalone',
-    experimental: {
-        appDir: true
-    }
+    async rewrites() {
+        return [
+            {
+                source: "/pdfs/:path*",           // public URL
+                destination: "/output/pdfs/:path*", // your real folder
+            },
+        ];
+    },
 };
 
 export default nextConfig;

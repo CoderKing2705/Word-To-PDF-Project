@@ -7,8 +7,8 @@
 
         <!-- Middle nav links -->
         <nav class="hidden md:flex space-x-6 text-white text-sm font-medium">
-            <a routerLink="/about" class="hover:text-indigo-200 transition">About</a>
-            <a routerLink="/help" class="hover:text-indigo-200 transition">Help</a>
+            <a *ngIf="isLoggedIn" routerLink="/about" class="hover:text-indigo-200 transition">About</a>
+            <a *ngIf="isLoggedIn" routerLink="/help" class="hover:text-indigo-200 transition">Help</a>
         </nav>
 
         <!-- Right section -->

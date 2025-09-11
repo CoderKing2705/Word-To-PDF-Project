@@ -3,7 +3,6 @@ import { prisma } from "../../../lib/prisma";
 import { saveFile, convertToPdf } from "../../../lib/storage";
 import { fileTypeFromBuffer } from "file-type";
 import { handleOptions, withCors } from "../../../lib/cors";
-import { verifyToken } from "../../../lib/auth";  // 👈 import JWT utils
 
 // 👇 this handles the preflight automatically
 export async function OPTIONS() {

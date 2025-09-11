@@ -10,10 +10,20 @@ export class ConversionService {
 
   constructor(private http: HttpClient) { }
 
+  // uploadFile(file: File): Observable<any> {
+  //   const formData = new FormData();
+  //   formData.append('file', file);
+  //   return this.http.post(`${this.apiUrl}/convert`, formData);
+  // }
+
   uploadFile(file: File): Observable<any> {
     const formData = new FormData();
     formData.append('file', file);
-    return this.http.post(`${this.apiUrl}/convert`, formData);
+
+    return this.http.post(`${this.apiUrl}/convert`, formData, {
+      reportProgress: true,
+      observe: 'events',   // 👈 so we get upload progress
+    });
   }
 
   getConversions(): Observable<any[]> {

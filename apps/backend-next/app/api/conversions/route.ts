@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { prisma } from "../../../lib/db.js";
-import { handleOptions, withCors } from "../../../lib/cors.js";
+import { prisma } from "../../../lib/db";
+import { handleOptions, withCors } from "../../../lib/cors";
 
 export async function OPTIONS() {
     return handleOptions();

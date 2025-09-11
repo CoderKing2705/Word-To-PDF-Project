@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ConversionService } from '../../services/conversion.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpEventType } from '@angular/common/http';
 
 @Component({
   selector: 'app-conversion-manager',
@@ -10,12 +11,17 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './conversion-manager.component.html',
   styleUrl: './conversion-manager.component.css'
 })
-export class ConversionManagerComponent {
+export class ConversionManagerComponent implements OnInit {
   file: File | null = null;
   conversions: any[] = [];
   loading = false;
   error: string | null = null;
 
+  // 👇 new fields
+  showConversions = false;
+  successMessage = '';
+  errorMessage = '';
+  uploadProgress = 0;
   constructor(private conversionService: ConversionService) { }
 
   ngOnInit(): void {
@@ -45,20 +51,37 @@ export class ConversionManagerComponent {
     this.error = null;
     this.file = selected;
   }
+
   uploadFile(): void {
     if (!this.file) return;
     this.loading = true;
+    this.error = null;
+    this.successMessage = '';
+    this.errorMessage = '';
+    this.uploadProgress = 0;
+
     this.conversionService.uploadFile(this.file).subscribe({
-      next: () => {
-        this.file = null;
-        this.loadConversions();
+      next: (event) => {
+        // Angular HttpEvent types:
+        if (event.type === HttpEventType.UploadProgress && event.total) {
+          this.uploadProgress = Math.round((100 * event.loaded) / event.total);
+        }
+        if (event.type === HttpEventType.Response) {
+          this.file = null;
+          this.loadConversions();
+          this.successMessage = 'File uploaded & converted successfully!';
+          setTimeout(() => (this.successMessage = ''), 4000);
+          this.loading = false;
+          this.uploadProgress = 0;
+        }
       },
       error: () => {
         this.error = 'Upload failed';
-      },
-      complete: () => {
+        this.errorMessage = 'Upload failed. Please try again.';
+        setTimeout(() => (this.errorMessage = ''), 4000);
         this.loading = false;
-      }
+        this.uploadProgress = 0;
+      },
     });
   }
 
